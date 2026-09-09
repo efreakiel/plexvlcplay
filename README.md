@@ -2,6 +2,8 @@
 
 Open the current Plex movie or episode in **VLC** (or any local player) from Plex Web.
 
+![Open in VLC on a Plex movie details page](screenshot.PNG)
+
 Plex’s browser player remuxes or transcodes a lot of files and cannot hand a library item to the player you already have installed. plexvlc sits *next to* Plex: a Chrome/Edge extension injects **Open in VLC**, and a small Python helper on `127.0.0.1` launches the file (or a Plex stream URL) in VLC.
 
 This does **not** patch Plex Media Server. Plex plugins are gone; this is a sidecar.
