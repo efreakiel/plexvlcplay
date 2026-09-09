@@ -157,8 +157,184 @@ function launchItem(item) {
   });
 }
 
-function playerLabel(cb) {
-  chrome.storage.local.get({ playerName: "VLC" }, (st) => cb(st.playerName || "VLC"));
+let playerNameCache = "VLC";
+chrome.storage.local.get({ playerName: "VLC" }, (st) => {
+  playerNameCache = st.playerName || "VLC";
+});
+if (chrome.storage.onChanged) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.playerName) {
+      playerNameCache = changes.playerName.newValue || "VLC";
+    }
+  });
+}
+
+function parseAnyPlexHref(href) {
+  if (!href) return {};
+  try {
+    const abs = new URL(href, location.href).href;
+    const parsed = parsePlexLocation(abs);
+    if (parsed.ratingKey) return parsed;
+  } catch {
+    /* ignore */
+  }
+  const m = String(href).match(/\/library\/metadata\/(\d+)/);
+  if (m) return { ratingKey: m[1] };
+  return {};
+}
+
+function itemFromKey(ratingKey, machineIdentifier, titleHint) {
+  const token = intercepted.plexToken || sessionToken();
+  if (!ratingKey) return { item: null, error: "no_key" };
+  if (!token) return { item: null, error: "no_token" };
+  const parsedPage = parsePlexLocation(location.href);
+  let pmsBaseUrl = intercepted.pmsBaseUrl;
+  if (!pmsBaseUrl && location.port === "32400") pmsBaseUrl = location.origin;
+  if (pmsBaseUrl && pmsOriginScore(pmsBaseUrl) === 0) pmsBaseUrl = null;
+  return {
+    item: {
+      ratingKey: String(ratingKey),
+      machineIdentifier: machineIdentifier || parsedPage.machineIdentifier || null,
+      pmsBaseUrl,
+      plexToken: token,
+      titleHint: titleHint || "",
+      mediaId: null,
+      partId: null,
+      offsetMs: null,
+    },
+  };
+}
+
+function ratingKeyFromNode(node) {
+  let el = node;
+  for (let i = 0; i < 14 && el; i++, el = el.parentElement) {
+    const hrefs = [];
+    if (el.getAttribute) {
+      const h = el.getAttribute("href");
+      if (h) hrefs.push(h);
+    }
+    if (el.querySelectorAll) {
+      el.querySelectorAll("a[href]").forEach((a) => hrefs.push(a.getAttribute("href")));
+    }
+    for (const href of hrefs) {
+      const parsed = parseAnyPlexHref(href);
+      if (parsed.ratingKey) return parsed;
+    }
+  }
+  return null;
+}
+
+function titleFromCard(node) {
+  const root =
+    (node.closest &&
+      node.closest('[class*="PosterCard"], [class*="MetadataDetailsRow"], [class*="ListItem"], [class*="MetadataPosterCard"]')) ||
+    node.parentElement;
+  if (!root) return "";
+  const img = root.querySelector && root.querySelector("img[alt]");
+  if (img && img.alt && img.alt.trim()) return img.alt.trim().slice(0, 200);
+  const t = root.querySelector && root.querySelector('[class*="title"], h2, h3');
+  if (t && t.textContent) return t.textContent.trim().slice(0, 200);
+  return "";
+}
+
+function moreButtonFrom(el) {
+  if (!el || !el.closest) return null;
+  if (el.closest(".plexvlc-open, .plexvlc-menu-item, #plexvlc-toast")) return null;
+  const node = el.closest("button, a, [role='button']") || el;
+  const testid = node.getAttribute && (node.getAttribute("data-testid") || "");
+  if (/sidebarLibrariesMoreButton/i.test(testid)) return null;
+  const label = ((node.getAttribute && (node.getAttribute("aria-label") || node.getAttribute("title"))) || "").trim();
+  const cls = node.className ? String(node.className) : "";
+  if (/moreButton/i.test(testid)) return node;
+  if (/^more actions$/i.test(label) || /^actions$/i.test(label)) return node;
+  if (/moreButton/i.test(cls)) return node;
+  return null;
+}
+
+let pendingMenu = null;
+
+function rememberMenuItem(fromNode) {
+  const parsed = ratingKeyFromNode(fromNode);
+  if (!parsed || !parsed.ratingKey) return;
+  pendingMenu = {
+    ratingKey: parsed.ratingKey,
+    machineIdentifier: parsed.machineIdentifier || null,
+    titleHint: titleFromCard(fromNode),
+    at: Date.now(),
+  };
+}
+
+function pendingStillFresh() {
+  return pendingMenu && Date.now() - pendingMenu.at < 15000;
+}
+
+function injectMenuItem(menu, name) {
+  if (!pendingStillFresh()) return;
+  if (menu.querySelector(".plexvlc-menu-item")) return;
+  const det = itemFromKey(pendingMenu.ratingKey, pendingMenu.machineIdentifier, pendingMenu.titleHint);
+  const sample = menu.querySelector('[class*="MenuItem-menuItem"]');
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = (sample ? sample.className + " " : "") + "plexvlc-menu-item";
+  btn.textContent = "Open in " + name;
+  btn.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (!det.item) {
+      toast(userError(det.error), "error");
+      return;
+    }
+    launchItem(det.item);
+  });
+  let play = null;
+  menu.querySelectorAll('[class*="MenuItem-menuItem"], button, a').forEach((it) => {
+    if (play) return;
+    if (/^play$/i.test((it.textContent || "").trim())) play = it;
+  });
+  if (play && play.parentNode) play.parentNode.insertBefore(btn, play.nextSibling);
+  else if (sample && sample.parentNode) sample.parentNode.insertBefore(btn, sample);
+  else menu.insertBefore(btn, menu.firstChild);
+}
+
+function injectOverlayPlay(name) {
+  if (!pendingStillFresh()) return;
+  const plays = document.querySelectorAll("button, a");
+  for (const n of plays) {
+    if (n.id === "plexvlc-open-btn" || n.classList.contains("plexvlc-open") || n.classList.contains("plexvlc-menu-item")) continue;
+    const label = (n.getAttribute("aria-label") || n.textContent || "").trim();
+    if (!/^play$/i.test(label) && !/^watch$/i.test(label)) continue;
+    const host = n.parentElement;
+    if (!host || host.querySelector(".plexvlc-open, .plexvlc-menu-item")) continue;
+    const inMenu = n.closest(
+      '[class*="Menu-menu"], [class*="MenuItem"], [role="dialog"], [class*="Modal"], [class*="PrePlayActionBar"], [class*="PrePlayMetadata"]'
+    );
+    if (!inMenu) continue;
+    const det = itemFromKey(pendingMenu.ratingKey, pendingMenu.machineIdentifier, pendingMenu.titleHint);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "plexvlc-open";
+    btn.textContent = "Open in " + name;
+    btn.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (!det.item) {
+        toast(userError(det.error), "error");
+        return;
+      }
+      launchItem(det.item);
+    });
+    host.insertBefore(btn, n.nextSibling);
+    return;
+  }
+}
+
+function injectMenus() {
+  if (!pendingStillFresh()) return;
+  const name = playerNameCache;
+  document.querySelectorAll('[class*="Menu-menu"]').forEach((menu) => {
+    if (menu.querySelector('[class*="MenuItem-menuItem"]')) injectMenuItem(menu, name);
+  });
+  injectOverlayPlay(name);
 }
 
 function injectButton() {
@@ -175,8 +351,10 @@ function injectButton() {
     }
   }
   if (!play || !play.parentElement) return;
-  playerLabel((name) => {
-    if (document.getElementById("plexvlc-open-btn")) return;
+  if (play.closest('[class*="Menu-menu"], [role="dialog"]')) return;
+  if (document.getElementById("plexvlc-open-btn")) return;
+  {
+    const name = playerNameCache;
     const btn = document.createElement("button");
     btn.id = "plexvlc-open-btn";
     btn.type = "button";
@@ -193,7 +371,7 @@ function injectButton() {
       launchItem(det.item);
     });
     play.parentElement.insertBefore(btn, play.nextSibling);
-  });
+  }
 }
 
 function userError(code) {
@@ -217,10 +395,32 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 });
 
-injectButton();
-setInterval(injectButton, 1000);
-window.addEventListener("hashchange", injectButton);
-window.addEventListener("popstate", injectButton);
-const obs = new MutationObserver(() => injectButton());
+document.addEventListener(
+  "pointerdown",
+  (ev) => {
+    const more = moreButtonFrom(ev.target);
+    if (more) rememberMenuItem(more);
+  },
+  true
+);
+
+function tick() {
+  injectButton();
+  injectMenus();
+}
+
+let tickTimer = null;
+function scheduleTick() {
+  if (tickTimer) return;
+  tickTimer = setTimeout(() => {
+    tickTimer = null;
+    tick();
+  }, 50);
+}
+
+tick();
+setInterval(tick, 800);
+window.addEventListener("hashchange", tick);
+window.addEventListener("popstate", tick);
+const obs = new MutationObserver(() => scheduleTick());
 obs.observe(document.body || document.documentElement, { childList: true, subtree: true });
-setTimeout(() => {}, 500);

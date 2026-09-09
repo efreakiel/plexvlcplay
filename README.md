@@ -11,6 +11,7 @@ This does **not** patch Plex Media Server. Plex plugins are gone; this is a side
 ## What you get
 
 - An **Open in VLC** button on movie/episode pages in Plex Web (`app.plex.tv` and the local `/web` UI)
+- The same action in a library poster’s **⋯ More Actions** menu, so you don’t have to open each item
 - Toolbar popup, right-click menu, and `Alt+Shift+V`
 - Prefers the **file on disk** when this PC can read `Part.file`
 - Otherwise streams via a LAN HTTP Plex URL (token on VLC’s command line — the toast tells you)
@@ -55,14 +56,24 @@ To start the helper right now (without rebooting):
 
 ### 3. Use it
 
-Open a movie or episode in Plex Web and click **Open in VLC**, or the toolbar icon, or `Alt+Shift+V`.
+Any of these open the current movie or episode in VLC:
+
+| Where | What to click |
+| --- | --- |
+| Details / preplay page | **Open in VLC** next to Plex’s Play button |
+| Library grid or hub | Poster **⋯** (bottom-right) → **Open in VLC** in the More Actions menu |
+| Any Plex tab | Toolbar icon, right-click the page, or `Alt+Shift+V` |
+
+You do not have to open the details page first. The ⋯ menu is the fast path from a poster wall.
+
+Shows, seasons, photos, and Plex Discover titles are not launched (the helper only accepts movies, episodes, and clips).
 
 Toasts:
 
 - `Opened {title} from disk` — VLC got a filesystem path
 - `Streaming {title} from Plex (token on VLC command line)` — VLC is playing a Plex HTTP URL
 
-If you browse Plex at `http://192.168.x.x:32400/web`, the popup offers **Allow this origin**. Grant it, **reload the tab once**, then the button appears.
+If you browse Plex at `http://192.168.x.x:32400/web`, the popup offers **Allow this origin**. Grant it, **reload the tab once**, then the button and ⋯ action appear.
 
 ## Config
 
