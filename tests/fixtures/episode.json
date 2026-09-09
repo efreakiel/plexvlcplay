@@ -1,0 +1,24 @@
+{
+  "MediaContainer": {
+    "Metadata": [
+      {
+        "ratingKey": "300",
+        "type": "episode",
+        "title": "Pilot",
+        "grandparentTitle": "Lost",
+        "parentIndex": 1,
+        "index": 1,
+        "duration": 2500000,
+        "viewOffset": 60000,
+        "Media": [
+          {
+            "id": 30,
+            "Part": [
+              { "id": 301, "key": "/library/parts/301/pilot.mkv", "file": "EP" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

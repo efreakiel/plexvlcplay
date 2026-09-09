@@ -1,0 +1,29 @@
+{
+  "MediaContainer": {
+    "Metadata": [
+      {
+        "ratingKey": "200",
+        "type": "movie",
+        "title": "Two Versions",
+        "duration": 5000000,
+        "Media": [
+          {
+            "id": 10,
+            "videoResolution": "480",
+            "selected": true,
+            "Part": [
+              { "id": 101, "key": "/library/parts/101/sd.mkv", "file": "SD" }
+            ]
+          },
+          {
+            "id": 20,
+            "videoResolution": "1080",
+            "Part": [
+              { "id": 201, "key": "/library/parts/201/hd.mkv", "file": "HD" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

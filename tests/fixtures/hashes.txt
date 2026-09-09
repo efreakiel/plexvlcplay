@@ -1,0 +1,26 @@
+# Hosted details (encoded key)
+https://app.plex.tv/desktop/#!/server/{machineId}/details?key=%2Flibrary%2Fmetadata%2F65547
+
+# Hosted details (decoded key + context)
+https://app.plex.tv/desktop/#!/server/{machineId}/details?key=/library/metadata/65547&context=source%3Acontent.library~0~2
+
+# Hosted media alias
+https://app.plex.tv/desktop/#!/media/{machineId}/details?key=/library/metadata/65547
+
+# Hosted preplay
+https://app.plex.tv/desktop/#!/server/{machineId}/preplay?key=%2Flibrary%2Fmetadata%2F65547
+
+# Hosted in-player
+https://app.plex.tv/desktop/#!/server/{machineId}/player?key=%2Flibrary%2Fmetadata%2F65547
+
+# Query-style server id
+https://app.plex.tv/desktop/#!/details?key=%2Flibrary%2Fmetadata%2F65547&server={machineId}
+
+# Local bundled web
+http://127.0.0.1:32400/web/index.html#!/server/{machineId}/details?key=%2Flibrary%2Fmetadata%2F65547
+
+# LAN bundled web
+http://192.168.1.50:32400/web/index.html#!/server/{machineId}/details?key=%2Flibrary%2Fmetadata%2F65547
+
+# OUT OF SCOPE Discover
+https://app.plex.tv/desktop/#!/provider/tv.plex.provider.metadata/details?key=/library/metadata/5d776827eb5d26001f1ddab7

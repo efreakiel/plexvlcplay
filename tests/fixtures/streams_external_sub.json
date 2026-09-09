@@ -1,0 +1,28 @@
+{
+  "MediaContainer": {
+    "Metadata": [
+      {
+        "ratingKey": "600",
+        "type": "movie",
+        "title": "Subs",
+        "duration": 1000000,
+        "Media": [
+          {
+            "id": 60,
+            "Part": [
+              {
+                "id": 601,
+                "key": "/library/parts/601/file.mkv",
+                "file": "MOV",
+                "Stream": [
+                  { "id": 1, "streamType": 3, "codec": "pgs", "selected": true },
+                  { "id": 2, "streamType": 3, "codec": "srt", "selected": false, "key": "/library/streams/2" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

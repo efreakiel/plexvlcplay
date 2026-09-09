@@ -1,0 +1,14 @@
+{
+  "MediaContainer": {
+    "Metadata": [
+      {
+        "ratingKey": "500",
+        "type": "photo",
+        "title": "Sunset",
+        "Media": [
+          { "id": 1, "Part": [{ "id": 1, "file": "x.jpg", "key": "/library/parts/1" }] }
+        ]
+      }
+    ]
+  }
+}

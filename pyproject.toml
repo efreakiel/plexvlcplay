@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plexvlc"
+version = "0.1.0"
+description = "Open Plex library items in VLC (or any local player) from Plex Web."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "plexvlc contributors" }]
+dependencies = []
+
+[project.scripts]
+plexvlc = "plexvlc.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["helper"]
+
+[tool.setuptools]
+include-package-data = true

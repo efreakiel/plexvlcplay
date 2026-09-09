@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "plexvlc",
+  "version": "0.1.0",
+  "description": "Open the current Plex movie or episode in VLC.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnY7oLtEJBQiMW2rBdrGYOUkNYWN7Xv0A93NfLCxrCPItVh69jy/A1xbm/cgJUU6ViwZhc7Q8omQZe/nTLO4fLzveYkxAkWsmnQqytoMUH0ZfunrwZim8r82CfWTo5bauY7YKIZV0fl03McLrOws2FiGBLgZfSX7ZR3vvc9Gkql+xOxz88+nKbKcFPda3/VAB+ZpJgrA0H3kIbPhpx07pjpsv6nNwhCvyTT8nsrfbzPhpHabWsR6tWHAfQbdggDdPV/cbTV6b4KfAHXWmvbkqzWzs8DIwkDFAOw6Y4SJkru/zLYtFe4c88MtdR8l6LeqOapaOFAUfG4kV45DRwlQC8QIDAQAB",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage", "contextMenus", "scripting", "activeTab"],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "https://app.plex.tv/*",
+    "https://*.plex.direct/*"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Open in VLC",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "options_ui": { "page": "options.html", "open_in_tab": true },
+  "commands": {
+    "open-in-player": {
+      "suggested_key": { "default": "Alt+Shift+V" },
+      "description": "Open current Plex item in the local player"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.plex.tv/*",
+        "http://127.0.0.1/web/*",
+        "http://localhost/web/*",
+        "https://*.plex.direct/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://app.plex.tv/*",
+        "http://127.0.0.1/web/*",
+        "http://localhost/web/*",
+        "https://*.plex.direct/*"
+      ],
+      "js": ["page-hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ]
+}

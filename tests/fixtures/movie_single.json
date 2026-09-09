@@ -1,0 +1,44 @@
+{
+  "MediaContainer": {
+    "size": 1,
+    "librarySectionID": 2,
+    "Metadata": [
+      {
+        "ratingKey": "65547",
+        "key": "/library/metadata/65547",
+        "type": "movie",
+        "title": "Aladdin",
+        "year": 1992,
+        "duration": 5423794,
+        "viewOffset": 120000,
+        "Media": [
+          {
+            "id": 73681,
+            "duration": 5423794,
+            "videoCodec": "h264",
+            "audioCodec": "ac3",
+            "container": "mkv",
+            "videoResolution": "480",
+            "Part": [
+              {
+                "id": 73812,
+                "key": "/library/parts/73812/1450141780/file.mkv",
+                "file": "PLACEHOLDER",
+                "duration": 5423794,
+                "container": "mkv",
+                "size": 1639520577,
+                "exists": 1,
+                "accessible": true,
+                "Stream": [
+                  { "id": 40197, "streamType": 1, "codec": "h264", "default": 1 },
+                  { "id": 40198, "streamType": 2, "codec": "aac", "selected": 1, "languageCode": "eng" },
+                  { "id": 40200, "streamType": 3, "codec": "srt", "selected": true, "languageCode": "eng", "key": "/library/streams/40200" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Living Room NAS",
+    "product": "Plex Media Server",
+    "clientIdentifier": "6a646027a56abb6dbdf72484564db8567c737430",
+    "provides": "server, player",
+    "owned": true,
+    "accessToken": "server-token-value",
+    "connections": [
+      {
+        "protocol": "http",
+        "address": "192.168.1.50",
+        "port": 32400,
+        "uri": "http://192.168.1.50:32400",
+        "local": true,
+        "relay": false,
+        "IPv6": false
+      },
+      {
+        "protocol": "https",
+        "address": "192.168.1.50",
+        "port": 32400,
+        "uri": "https://192-168-1-50.hash.plex.direct:32400",
+        "local": true,
+        "relay": false
+      },
+      {
+        "protocol": "https",
+        "address": "203.0.113.9",
+        "port": 32400,
+        "uri": "https://203-0-113-9.hash.plex.direct:32400",
+        "local": false,
+        "relay": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "MediaContainer": {
+    "Metadata": [
+      {
+        "ratingKey": "100",
+        "type": "movie",
+        "title": "Kill Bill",
+        "duration": 7200000,
+        "viewOffset": 0,
+        "Media": [
+          {
+            "id": 1,
+            "Part": [
+              {
+                "id": 11,
+                "key": "/library/parts/11/file.mkv",
+                "file": "CD1",
+                "exists": true,
+                "Stream": []
+              },
+              {
+                "id": 12,
+                "key": "/library/parts/12/file.mkv",
+                "file": "CD2",
+                "exists": "1",
+                "Stream": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

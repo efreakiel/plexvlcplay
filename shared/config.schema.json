@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plexvlc.local/config.schema.json",
+  "title": "plexvlc helper config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "listen_port", "helper_secret", "client_identifier", "player", "allowed_extension_ids"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "listen_port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+    "helper_secret": { "type": "string" },
+    "client_identifier": { "type": "string" },
+    "log_level": { "type": "string", "enum": ["DEBUG", "INFO", "WARNING", "ERROR"] },
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "executable", "args_file", "args_url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "executable": { "type": "string" },
+        "args_file": { "type": "array", "items": { "type": "string" } },
+        "args_url": { "type": "array", "items": { "type": "string" } },
+        "args_extra": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "allowed_extension_ids": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-p]{32}$" }
+    }
+  }
+}

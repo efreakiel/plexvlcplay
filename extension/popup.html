@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>plexvlc</title>
+  <style>
+    body { font: 13px/1.4 system-ui, Segoe UI, sans-serif; margin: 0; width: 320px; background: #111; color: #eee; }
+    main { padding: 12px 14px 16px; }
+    h1 { font-size: 14px; margin: 0 0 8px; }
+    button { background: #e07a22; color: #fff; border: 0; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-weight: 600; }
+    button.secondary { background: #333; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .muted { color: #aaa; font-size: 12px; }
+    .err { color: #f0a8a2; }
+    .ok { color: #c6e2a5; }
+    .row { margin: 8px 0; }
+    a { color: #e07a22; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>plexvlc</h1>
+    <div id="status" class="muted">Checking this tab…</div>
+    <div class="row" id="actions"></div>
+    <div class="row muted"><a href="options.html" target="_blank">Options</a></div>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

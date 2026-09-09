@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>plexvlc options</title>
+  <style>
+    body { font: 15px/1.45 system-ui, Segoe UI, sans-serif; margin: 0; background: #111; color: #eee; }
+    main { max-width: 640px; margin: 0 auto; padding: 32px 20px; }
+    h1 { font-size: 22px; }
+    label { display: block; margin: 12px 0 4px; color: #ccc; }
+    input[type=text] { width: 100%; padding: 8px; background: #1c1c1c; color: #eee; border: 1px solid #333; border-radius: 4px; box-sizing: border-box; }
+    button { background: #e07a22; color: #fff; border: 0; border-radius: 4px; padding: 8px 14px; cursor: pointer; font-weight: 600; margin-top: 8px; }
+    button.secondary { background: #333; }
+    .card { background: #1a1a1a; padding: 16px; border-radius: 8px; margin: 16px 0; }
+    .muted { color: #999; font-size: 13px; }
+    .ok { color: #c6e2a5; }
+    .err { color: #f0a8a2; }
+    code { font-family: Consolas, monospace; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>plexvlc</h1>
+    <p class="muted">The helper starts with Plex after you log in. No pairing code. Use <strong>Open in VLC</strong> on Plex Web.</p>
+
+    <div class="card">
+      <h2>Helper status</h2>
+      <p id="health" class="muted">Checking…</p>
+      <p class="muted">Log file: <code id="logPath">—</code></p>
+      <label>Helper port</label>
+      <input id="port" type="text" value="18765" />
+      <button id="savePort" class="secondary" type="button">Save port</button>
+    </div>
+
+    <div class="card">
+      <h2>Paste Plex token (fallback)</h2>
+      <p class="muted">Only if the extension cannot read the live session. Plex Web → ⋮ → Get Info → View XML → URL <code>X-Plex-Token=</code>. Stored in session storage (cleared when the browser closes), not on disk.</p>
+      <label>X-Plex-Token</label>
+      <input id="plexToken" type="text" autocomplete="off" />
+      <button id="saveToken" class="secondary" type="button">Save session token</button>
+      <p id="tokenStatus" class="muted"></p>
+    </div>
+
+    <div class="card">
+      <h2>LAN Plex Web</h2>
+      <p class="muted">If you open Plex at <code>http://192.168.x.x:32400/web</code>, grant this origin, then reload the tab once.</p>
+      <label>Origin (e.g. http://192.168.1.50:32400)</label>
+      <input id="lanOrigin" type="text" />
+      <button id="grantLan" type="button">Allow this origin</button>
+      <p id="lanStatus" class="muted"></p>
+    </div>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>

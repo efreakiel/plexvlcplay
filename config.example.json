@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "listen_port": 18765,
+  "helper_secret": "",
+  "client_identifier": "",
+  "player": {
+    "name": "VLC",
+    "executable": "",
+    "args_file": ["--start-time={start_seconds}", "--sub-file={sub_file}", "{paths}"],
+    "args_url": ["--start-time={start_seconds}", "--sub-file={sub_file}", "{urls}"],
+    "args_extra": ["--no-video-title-show"]
+  },
+  "allowed_extension_ids": ["hpdhegbljejbmohafhhgdkmbhonodpal"],
+  "log_level": "INFO"
+}

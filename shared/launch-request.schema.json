@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://plexvlc.local/launch-request.schema.json",
+  "title": "POST /v1/launch body",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ratingKey", "plexToken"],
+  "properties": {
+    "ratingKey": { "type": "string", "pattern": "^[0-9]+$" },
+    "plexToken": { "type": "string", "minLength": 8, "maxLength": 512 },
+    "pmsBaseUrl": { "type": "string", "maxLength": 256 },
+    "machineIdentifier": { "type": "string", "maxLength": 128 },
+    "mediaId": { "type": ["integer", "null"], "minimum": 1 },
+    "partId": { "type": ["integer", "null"], "minimum": 1 },
+    "offsetMs": { "type": ["integer", "null"], "minimum": 0 },
+    "titleHint": { "type": "string", "maxLength": 512 }
+  }
+}
