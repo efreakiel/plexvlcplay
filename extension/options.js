@@ -10,6 +10,8 @@ async function refreshHealth() {
     healthEl.textContent = "Helper " + res.version + " listening on " + res.listen + " (player: " + res.player + ")";
     logEl.textContent = res.logPath || "—";
     if (res.helperPort) portEl.value = String(res.helperPort);
+    const openEl = document.getElementById("openLabel");
+    if (openEl && res.player) openEl.textContent = "Open in " + res.player;
   } else {
     healthEl.className = "err";
     healthEl.textContent = "Helper is not running. It starts with Plex after login; or run helper\\scripts\\start.ps1.";

@@ -10,7 +10,7 @@ This does **not** patch Plex Media Server. Plex plugins are gone; this is a side
 
 ## What you get
 
-- An **Open in VLC** button on movie/episode pages in Plex Web (`app.plex.tv` and the local `/web` UI)
+- An **Open in {player.name}** button on movie/episode pages in Plex Web (`app.plex.tv` and the local `/web` UI). Default name is VLC; it follows `%APPDATA%\plexvlc\config.json`
 - The same action in a library poster’s **⋯ More Actions** menu, so you don’t have to open each item
 - Toolbar popup, right-click menu, and `Alt+Shift+V`
 - Prefers the **file on disk** when this PC can read `Part.file`
@@ -60,8 +60,8 @@ Any of these open the current movie or episode in VLC:
 
 | Where | What to click |
 | --- | --- |
-| Details / preplay page | **Open in VLC** next to Plex’s Play button |
-| Library grid or hub | Poster **⋯** (bottom-right) → **Open in VLC** in the More Actions menu |
+| Details / preplay page | **Open in {player.name}** next to Plex’s Play button |
+| Library grid or hub | Poster **⋯** (bottom-right) → **Open in {player.name}** in the More Actions menu |
 | Any Plex tab | Toolbar icon, right-click the page, or `Alt+Shift+V` |
 
 You do not have to open the details page first. The ⋯ menu is the fast path from a poster wall.
@@ -83,6 +83,7 @@ If you browse Plex at `http://192.168.x.x:32400/web`, the popup offers **Allow t
 | --- | --- |
 | `listen_port` | Default `18765`. Bind is **always** `127.0.0.1`. If the port is taken, the helper exits 2 — it does not pick another port. |
 | `helper_secret` | Optional. Required only for CLI tools with no `Origin` header. The Chrome/Edge extension does not need it. |
+| `player.name` | Shown in Plex Web as **Open in {name}** (details button, ⋯ menu, popup, toolbar tooltip). Default `VLC`. Restart the helper after changing this. |
 | `player.executable` | Empty = auto-discover VLC. Otherwise a full path. **This is arbitrary code execution as your user.** |
 | `player.args_file` / `args_url` | Templates. Placeholders: `{paths}`, `{urls}`, `{start_seconds}`, `{sub_file}`, `{title}`. |
 | `allowed_extension_ids` | Chrome IDs matching `^[a-p]{32}$`. Empty list = no extension may pair. |

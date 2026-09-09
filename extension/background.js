@@ -24,6 +24,27 @@ function helperOrigin(port) {
   return "http://127.0.0.1:" + (port || DEFAULT_PORT);
 }
 
+function openLabel(name) {
+  const n = String(name || "VLC").trim() || "VLC";
+  return "Open in " + n;
+}
+
+async function applyPlayerName(name) {
+  const n = String(name || "VLC").trim().slice(0, 64) || "VLC";
+  await chrome.storage.local.set({ playerName: n });
+  try {
+    await chrome.action.setTitle({ title: openLabel(n) });
+  } catch {
+    /* ignore */
+  }
+  try {
+    await chrome.contextMenus.update("plexvlc-open", { title: openLabel(n) });
+  } catch {
+    /* menu may not exist yet */
+  }
+  return n;
+}
+
 async function settings() {
   const st = await chrome.storage.local.get({
     helperSecret: "",
@@ -71,9 +92,10 @@ function toastMessage(data) {
     return USER_ERRORS[err] || err;
   }
   const title = data.title || "item";
+  const player = (data.player || "VLC").trim() || "VLC";
   if (data.mode === "file") return "Opened " + title + " from disk";
-  if (data.mode === "url") return "Streaming " + title + " from Plex (token on VLC command line)";
-  return "Opened in VLC";
+  if (data.mode === "url") return "Streaming " + title + " from Plex (token on " + player + " command line)";
+  return "Opened in " + player;
 }
 
 async function launchItem(item) {
@@ -96,12 +118,14 @@ async function launchItem(item) {
   if (item.offsetMs != null) body.offsetMs = item.offsetMs;
   if (item.titleHint) body.titleHint = item.titleHint;
   const { data } = await helperFetch("/v1/launch", { method: "POST", body, secret: true });
+  if (data && data.player) await applyPlayerName(data.player);
   const message = toastMessage(data);
   return {
     ok: !!data.ok,
     mode: data.mode,
     title: data.title,
     pathHint: data.pathHint,
+    player: data.player,
     message,
     error: data.error,
   };
@@ -110,10 +134,11 @@ async function launchItem(item) {
 async function health() {
   const { data } = await helperFetch("/v1/health", { secret: false });
   const st = await settings();
+  if (data && data.ok && data.player) await applyPlayerName(data.player);
   return {
     ok: !!data.ok,
     version: data.version,
-    player: data.player,
+    player: data.player || st.playerName,
     logPath: data.logPath,
     listen: data.listen,
     helperPort: st.helperPort,
@@ -187,11 +212,11 @@ async function restoreLanScripts() {
   }
 }
 
-chrome.runtime.onInstalled.addListener(() => {
+function createContextMenu(title) {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: "plexvlc-open",
-      title: "Open in VLC",
+      title: title || "Open in VLC",
       contexts: ["page"],
       documentUrlPatterns: [
         "https://app.plex.tv/*",
@@ -201,11 +226,18 @@ chrome.runtime.onInstalled.addListener(() => {
       ],
     });
   });
+}
+
+chrome.runtime.onInstalled.addListener(async () => {
+  const st = await settings();
+  createContextMenu(openLabel(st.playerName));
   restoreLanScripts();
+  health();
 });
 
 chrome.runtime.onStartup.addListener(() => {
   restoreLanScripts();
+  health();
 });
 
 async function detectOnTab(tabId) {

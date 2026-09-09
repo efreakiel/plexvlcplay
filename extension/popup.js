@@ -90,7 +90,15 @@ async function init() {
 
   const hint = det.item.titleHint || ("ratingKey " + det.item.ratingKey);
   setStatus(hint);
-  const btn = addButton("Open in VLC");
+  let playerName = "VLC";
+  try {
+    const health = await chrome.runtime.sendMessage({ type: "plexvlc.health" });
+    if (health && health.player) playerName = health.player;
+  } catch {
+    const st = await chrome.storage.local.get({ playerName: "VLC" });
+    playerName = st.playerName || "VLC";
+  }
+  const btn = addButton("Open in " + playerName);
   btn.addEventListener("click", async () => {
     btn.disabled = true;
     const res = await chrome.runtime.sendMessage({ type: "plexvlc.launch", item: det.item });

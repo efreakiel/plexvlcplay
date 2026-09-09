@@ -149,25 +149,46 @@ function launchItem(item) {
       if (err === "helper_unreachable") {
         toast("plexvlc helper is not running. It starts with Plex after login; or run helper\\scripts\\start.ps1.", "error");
       } else {
-        toast(res && res.message ? res.message : "Could not open in VLC (" + err + ")", "error");
+        toast(res && res.message ? res.message : "Could not open in " + playerNameCache + " (" + err + ")", "error");
       }
       return;
     }
-    toast(res.message || "Opened in VLC", "ok");
+    toast(res.message || "Opened in " + playerNameCache, "ok");
   });
 }
 
 let playerNameCache = "VLC";
+
+function openLabel() {
+  return "Open in " + (playerNameCache || "VLC");
+}
+
+function relabelOpenButtons() {
+  const label = openLabel();
+  document.querySelectorAll(".plexvlc-open, .plexvlc-menu-item, #plexvlc-open-btn").forEach((el) => {
+    el.textContent = label;
+  });
+}
+
 chrome.storage.local.get({ playerName: "VLC" }, (st) => {
   playerNameCache = st.playerName || "VLC";
+  relabelOpenButtons();
 });
 if (chrome.storage.onChanged) {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "local" && changes.playerName) {
       playerNameCache = changes.playerName.newValue || "VLC";
+      relabelOpenButtons();
     }
   });
 }
+chrome.runtime.sendMessage({ type: "plexvlc.health" }, (res) => {
+  if (chrome.runtime.lastError) return;
+  if (res && res.player) {
+    playerNameCache = res.player;
+    relabelOpenButtons();
+  }
+});
 
 function parseAnyPlexHref(href) {
   if (!href) return {};
