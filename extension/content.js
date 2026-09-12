@@ -317,19 +317,63 @@ function injectMenuItem(menu, name) {
   else menu.insertBefore(btn, menu.firstChild);
 }
 
+function isPlayerChrome(el) {
+  if (!el || !el.closest) return false;
+  if (el.closest("video, audio, .shaka-player")) return true;
+  if (
+    el.closest(
+      '[class*="AudioVideoFullPlayer"], [class*="PlayerControls"], [class*="FullPlayer"], [class*="PlayButton-playCircle"], [class*="playCircle"], [class*="PosterCard"], [data-testid="metadataPosterPlayButton"]'
+    )
+  ) {
+    return true;
+  }
+  const cls = el.className ? String(el.className) : "";
+  if (/playCircle|PlayerControls|FullPlayer|shaka/i.test(cls)) return true;
+  return false;
+}
+
+function visibleText(el) {
+  return ((el && (el.innerText || el.textContent)) || "").replace(/\s+/g, " ").trim();
+}
+
+function findDetailsPlayButton() {
+  const labeled = [];
+  document.querySelectorAll("button, a").forEach((n) => {
+    if (n.id === "plexvlc-open-btn" || n.classList.contains("plexvlc-open") || n.classList.contains("plexvlc-menu-item")) return;
+    if (isPlayerChrome(n)) return;
+    if (n.closest('[class*="Menu-menu"], [role="dialog"]')) return;
+    const text = visibleText(n);
+    if (/^play$/i.test(text) || /^watch$/i.test(text)) labeled.push(n);
+  });
+  const actionRow =
+    '[class*="PrePlayActionBar"], [class*="PrePlayPageHeader"], [class*="PrePlayDetails"], [class*="PrePlayMetadataInner"], [class*="PrePlayMetadataContent"]';
+  for (const n of labeled) {
+    if (n.closest(actionRow)) return n;
+  }
+  return labeled[0] || null;
+}
+
+function pruneMisplacedButtons() {
+  document.querySelectorAll("#plexvlc-open-btn, button.plexvlc-open").forEach((el) => {
+    if (el.classList.contains("plexvlc-menu-item")) return;
+    if (isPlayerChrome(el) || isPlayerChrome(el.parentElement)) el.remove();
+  });
+}
+
 function injectOverlayPlay(name) {
   if (!pendingStillFresh()) return;
   const plays = document.querySelectorAll("button, a");
   for (const n of plays) {
     if (n.id === "plexvlc-open-btn" || n.classList.contains("plexvlc-open") || n.classList.contains("plexvlc-menu-item")) continue;
-    const label = (n.getAttribute("aria-label") || n.textContent || "").trim();
-    if (!/^play$/i.test(label) && !/^watch$/i.test(label)) continue;
+    if (isPlayerChrome(n)) continue;
+    const text = visibleText(n);
+    const aria = (n.getAttribute("aria-label") || "").trim();
+    if (!/^play$/i.test(text) && !/^watch$/i.test(text) && !/^play$/i.test(aria) && !/^watch$/i.test(aria)) continue;
     const host = n.parentElement;
     if (!host || host.querySelector(".plexvlc-open, .plexvlc-menu-item")) continue;
-    const inMenu = n.closest(
-      '[class*="Menu-menu"], [class*="MenuItem"], [role="dialog"], [class*="Modal"], [class*="PrePlayActionBar"], [class*="PrePlayMetadata"]'
-    );
+    const inMenu = n.closest('[class*="Menu-menu"], [class*="MenuItem-menuItem"], [role="dialog"], [class*="Modal-"]');
     if (!inMenu) continue;
+    if (n.closest('[class*="PrePlayPageContent"], [class*="PrePlayMetadata-container"]')) continue;
     const det = itemFromKey(pendingMenu.ratingKey, pendingMenu.machineIdentifier, pendingMenu.titleHint);
     const btn = document.createElement("button");
     btn.type = "button";
@@ -359,20 +403,16 @@ function injectMenus() {
 }
 
 function injectButton() {
+  pruneMisplacedButtons();
   const parsed = parsePlexLocation(location.href);
-  if (!parsed.ratingKey) return;
-  if (document.getElementById("plexvlc-open-btn")) return;
-  const nodes = document.querySelectorAll("button, a");
-  let play = null;
-  for (const n of nodes) {
-    const label = (n.getAttribute("aria-label") || n.textContent || "").trim();
-    if (/^play$/i.test(label) || /^watch$/i.test(label)) {
-      play = n;
-      break;
-    }
+  if (!parsed.ratingKey) {
+    const stray = document.getElementById("plexvlc-open-btn");
+    if (stray && !stray.closest('[class*="Menu-menu"]')) stray.remove();
+    return;
   }
+  if (document.getElementById("plexvlc-open-btn")) return;
+  const play = findDetailsPlayButton();
   if (!play || !play.parentElement) return;
-  if (play.closest('[class*="Menu-menu"], [role="dialog"]')) return;
   if (document.getElementById("plexvlc-open-btn")) return;
   {
     const name = playerNameCache;
